@@ -22,7 +22,7 @@ RUN \
   sed -i -e 's/^\(dir .*\)$/# \1\ndir \/var\/redis\/data\//' \
          -e 's/^\(logfile .*\)$/# \1/' \
          -e 's/^#?\s*daemonize .*/daemonize yes/' \
-         -e 's/^# syslog-enabled no$/syslog-enabled yes/' \
+         -e 's;^# logfile.*$;logfile "/var/log/redis.log";' \
          -e 's/^\(# bind .*\)$/# \1\nbind 0.0.0.0/' \
          /etc/redis/redis.conf 
 
@@ -37,6 +37,17 @@ RUN useradd -s /bin/false --user-group redisserver
 # Force to change password.
 RUN passwd -e redis
 RUN gpasswd -a redis sudo
+
+# Prepare log file for redis.
+RUN \
+  touch /var/log/redis.log && \
+  chown redis:redis /var/log/redis.log
+
+# Prepare data directory for redis.
+RUN \
+  mkdir -p /var/redis/data && \
+  chgrp redis /var/redis/data && \
+  chmod g+sw /var/redis/data
 
 # Use non standard port for ssh(22) to prevent atack.
 RUN sed -i.bak "s/Port 22/Port 2201/" /etc/ssh/sshd_config
