@@ -1,9 +1,12 @@
 FROM ubuntu:14.04
 MAINTAINER Shisei Hanai<ruimo.uno@gmail.com>
 
+# log will be written in /var/log/redis/redis.log
+# data will be written in /var/redis/data/
+
 RUN \
   apt-get update && \
-  apt-get install -y wget build-essential openssh-server monit
+  apt-get install -y wget build-essential monit
 
 # Install Redis.
 RUN \
@@ -22,41 +25,11 @@ RUN \
   sed -i -e 's/^\(dir .*\)$/# \1\ndir \/var\/redis\/data\//' \
          -e 's/^\(logfile .*\)$/# \1/' \
          -e 's/^#?\s*daemonize .*/daemonize yes/' \
-         -e 's;^# logfile.*$;logfile "/var/log/redis.log";' \
+         -e 's;^# syslog-enabled.*$;syslog-enabled yes;' \
          -e 's/^\(# bind .*\)$/# \1\nbind 0.0.0.0/' \
          /etc/redis/redis.conf 
 
 ADD monit   /etc/monit/conf.d/
-
-# This user is a user for ssh login. Initial password = 'password'.
-RUN useradd -p `perl -e "print(crypt('password', 'AB'));"` -s /bin/bash --create-home --user-group redis
-
-# This user is a user to execute redis.
-RUN useradd -s /bin/false --user-group redisserver
-
-# Force to change password.
-RUN passwd -e redis
-RUN gpasswd -a redis sudo
-
-# Prepare log file for redis.
-RUN \
-  touch /var/log/redis.log && \
-  chown redis:redis /var/log/redis.log
-
-# Prepare data directory for redis.
-RUN \
-  mkdir -p /var/redis/data && \
-  chgrp redis /var/redis/data && \
-  chmod g+sw /var/redis/data
-
-# Use non standard port for ssh(22) to prevent atack.
-RUN sed -i.bak "s/Port 22/Port 2201/" /etc/ssh/sshd_config
-
-RUN mkdir /home/redis/.ssh
-ONBUILD ADD authorized_keys /home/redis/.ssh/authorized_keys
-ONBUILD RUN chmod 755 /home/redis
-ONBUILD RUN chmod 600 /home/redis/.ssh/authorized_keys
-ONBUILD RUN chown -R redis:redis /home/redis/.ssh
 
 # Define mountable directories.
 VOLUME ["/var/redis/data"]
@@ -65,6 +38,5 @@ VOLUME ["/var/redis/data"]
 WORKDIR /var/redis/data
 
 EXPOSE 6379
-EXPOSE 2201
 
 CMD ["/usr/bin/monit", "-I", "-c", "/etc/monit/monitrc"]
