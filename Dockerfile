@@ -31,6 +31,8 @@ RUN \
 
 ADD monit   /etc/monit/conf.d/
 
+RUN useradd -s /bin/false --create-home --user-group redis
+
 # Define mountable directories.
 VOLUME ["/var/redis/data"]
 
