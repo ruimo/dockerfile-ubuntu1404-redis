@@ -11,7 +11,6 @@ Just use launch.sh(Mac/Linux) or launch.bat(Windows) to start server. The contai
 Once Redis server is launched, you can check the server by cli.sh/cli.bat.
 
 ```
-./cli.sh
 $ ./cli.sh
 root@xxxxxxxxx:/var/redis/data# redis-cli -h redis
 redis:6379> set Hello "World"
