@@ -30,15 +30,20 @@ RUN \
          /etc/redis/redis.conf 
 
 ADD monit   /etc/monit/conf.d/
+ADD bin     /usr/local/bin/
 
 RUN useradd -s /bin/false --create-home --user-group redis
 
 # Define mountable directories.
 VOLUME ["/var/redis/data"]
 
+RUN chown -R redis:redis /var/redis
+
 # Define working directory.
 WORKDIR /var/redis/data
 
 EXPOSE 6379
 
-CMD ["/usr/bin/monit", "-I", "-c", "/etc/monit/monitrc"]
+ADD profile /profile
+
+CMD ["/bin/bash", "--rcfile", "/profile", "-i"]
