@@ -29,7 +29,7 @@ RUN \
          -e 's;^# syslog-enabled.*$;syslog-enabled yes;' \
          -e 's/^\(# bind .*\)$/# \1\nbind 0.0.0.0/' \
          /etc/redis/redis.conf 
-RUN echo "logfile /var/redis/redis.log"
+RUN echo "logfile /var/redis/redis.log" >> /etc/redis/redis.conf
 
 ADD monit   /etc/monit/conf.d/
 ADD bin     /usr/local/bin/
