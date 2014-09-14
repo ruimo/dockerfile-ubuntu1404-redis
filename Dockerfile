@@ -19,7 +19,8 @@ RUN \
   cp -f src/redis-sentinel /usr/local/bin && \
   mkdir -p /etc/redis && \
   cp -f *.conf /etc/redis && \
-  rm -rf /tmp/redis-stable*
+  rm -rf /tmp/redis-stable* && \
+  echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
 
 RUN \
   sed -i -e 's/^\(dir .*\)$/# \1\ndir \/var\/redis\/data\//' \
@@ -28,6 +29,7 @@ RUN \
          -e 's;^# syslog-enabled.*$;syslog-enabled yes;' \
          -e 's/^\(# bind .*\)$/# \1\nbind 0.0.0.0/' \
          /etc/redis/redis.conf 
+RUN echo "logfile /var/redis/redis.log"
 
 ADD monit   /etc/monit/conf.d/
 ADD bin     /usr/local/bin/
