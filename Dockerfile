@@ -26,7 +26,6 @@ RUN \
   sed -i -e 's/^\(dir .*\)$/# \1\ndir \/var\/redis\/data\//' \
          -e 's/^\(logfile .*\)$/# \1/' \
          -e 's/^#?\s*daemonize .*/daemonize yes/' \
-         -e 's;^# syslog-enabled.*$;syslog-enabled yes;' \
          -e 's/^\(# bind .*\)$/# \1\nbind 0.0.0.0/' \
          /etc/redis/redis.conf 
 RUN echo "logfile /var/redis/redis.log" >> /etc/redis/redis.conf
