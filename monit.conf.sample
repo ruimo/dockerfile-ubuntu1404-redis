@@ -1,0 +1,3 @@
+check program redis path /home/shanai/docker/dockerfile-ubuntu1404-redis/pingAndRestart.sh
+    if status > 0 then alert
+
