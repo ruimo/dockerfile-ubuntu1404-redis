@@ -46,5 +46,6 @@ WORKDIR /var/redis/data
 EXPOSE 6379
 
 ADD profile /profile
+RUN echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
 
 CMD ["/bin/bash", "--rcfile", "/profile", "-i"]
